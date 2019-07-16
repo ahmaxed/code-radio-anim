@@ -1,0 +1,32 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="./interface.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<main>
+			<div id="visualizer"></div>
+			<details>
+				<summary>Keyboard Controls</summary>
+				<dl>
+					<dt>Play/Pause:</dt><dd>Spacebar or "k"</dd>
+					<dt>Volume:</dt><dd>Up Arrow / Down Arrow</dd>
+				</dl>
+			</detail>
+		</main>
+		<footer>
+			<div data-meta="picture"></div>
+			<div id="nowPlaying">
+				<progress value="0" max="100" data-meta="duration"></progress>
+				<div data-meta="title"></div>
+				<div data-meta="artist"></div>
+				<div data-meta="album"></div>
+				<div data-meta="listeners"></div>
+			</div>
+		</footer>
+    	<script src="./player.js"></script>
+    	<script>
+        	var fCC_Player = new CodeRadio()
+    	</script>
+	</body>
+</html>
