@@ -1,136 +1,138 @@
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
-    margin: 0px;
-    padding: 0px;
-    font-family: "Open Sans", sans-serif;
-    background-size: cover;
-    background-position: center center;
-    overflow: hidden;
+  margin: 0px;
+  padding: 0px;
+  font-family: "Open Sans", sans-serif;
+  background-size: cover;
+  background-position: center center;
+  overflow: hidden;
 }
 
 footer {
-    background-color:#0a0a23;
-    height: 70px;
-    width: 100%;
-    position: relative;
-    color: #FFF;
-    border-top: 3px solid #FFF;
-    box-shadow: 0px 0px 4px #000;
-    z-index: 10;
+  background-color: #0a0a23;
+  height: 70px;
+  width: 100%;
+  position: relative;
+  color: #fff;
+  border-top: 3px solid #fff;
+  box-shadow: 0px 0px 4px #000;
+  z-index: 10;
 }
 
 [data-meta="title"] {
-    font-size: 18px
+  font-size: 18px;
 }
 [data-meta="artist"] {
-    font-size: 14px;
+  font-size: 14px;
 }
 [data-meta="album"] {
-    font-size: 10px;
+  font-size: 10px;
 }
 
 [data-meta="picture"] {
-    height: 70px;
-    width: 70px;
-    position: absolute;
-    background-size: cover;
-    background-position: center center;
+  height: 70px;
+  width: 70px;
+  position: absolute;
+  background-size: cover;
+  background-position: center center;
 }
 
 [data-meta="listeners"] {
-    position: absolute;
-    right: 10px;
-    top: 10px;
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }
 
 #nowPlaying {
-    height: 100%;
-    left: 70px;
-    width: calc(100% - 70px);
-    position: relative;
-    padding-left: 4px;
+  height: 100%;
+  left: 70px;
+  width: calc(100% - 70px);
+  position: relative;
+  padding-left: 4px;
 }
 
 #visualizer {
-    height: 100%;
-    width: 100%;
-    position: relative;
-    z-index: 10;
-    pointer-events: none;
+  height: 100%;
+  width: 100%;
+  position: relative;
+  z-index: 10;
+  pointer-events: none;
 }
 
 #visualizer canvas {
-    height: 100%;
-    width: 100%;
+  height: 100%;
+  width: 100%;
 }
 
 #nowPlaying progress {
-    position: absolute;
-    bottom: 4px;
-    left: 4px;
-    height: 4px;
-    width: calc(100% - 8px);
-    background-color: silver;
-    border-radius: 50%;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  height: 4px;
+  width: calc(100% - 8px);
+  background-color: silver;
+  border-radius: 50%;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
 }
 
 #nowPlaying progress::-webkit-progress-bar {
-    background-color: rgb(10, 10, 35);
-    border-radius: 2px;
+  background-color: rgb(10, 10, 35);
+  border-radius: 2px;
 }
 
 #nowPlaying progress::-webkit-progress-value {
-    background-color: white;
-    border-radius: 2px;
-    transition: all .1s linear;
+  background-color: white;
+  border-radius: 2px;
+  transition: all 0.1s linear;
 }
 
 main {
-    background-image: url("./images/bg.gif");
-    background-position: left bottom;
-    background-repeat: no-repeat;
-    position: relative;
-    width: 100%;
-    height: calc(100% - 70px);
+  background-image: url("./images/bg.png");
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  position: relative;
+  width: 100%;
+  height: calc(100% - 70px);
 }
 
 main::before {
-    content: "";
-    background-image: url("./images/Saron2.gif");
-    left: 388px;
-    bottom: 0px;
-    width: 509px;
-    height: 767px;
-    position: absolute;
+  content: "";
+  background-image: url("./images/Saron2.gif");
+  left: 388px;
+  bottom: 0px;
+  width: 509px;
+  height: 767px;
+  position: absolute;
 }
 
 details {
-    position: absolute;
-    bottom: 50px;
-    right: 50px;
-    background-color: rgba(10, 10, 35, 0.6);
-    color: #fff;
-    padding: 15px;
-    border-radius: 15px;
-    opacity: 0.1;
-    transition: opacity 0.25s ease-out;
+  position: absolute;
+  bottom: 50px;
+  right: 50px;
+  background-color: rgba(10, 10, 35, 0.6);
+  color: #fff;
+  padding: 15px;
+  border-radius: 15px;
+  opacity: 0.1;
+  transition: opacity 0.25s ease-out;
 }
 
 details:hover,
 details[open] {
-    opacity: 1;
+  opacity: 1;
 }
 
 dt {
-    margin-top: 10px;
-    margin-inline-start: 0px;
+  margin-top: 10px;
+  margin-inline-start: 0px;
 }
 
 dd {
-    margin-inline-start: 10px;
-    font-style: italic;
+  margin-inline-start: 10px;
+  font-style: italic;
 }
