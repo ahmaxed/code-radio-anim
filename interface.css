@@ -157,6 +157,7 @@ dd {
   z-index: 1000;
   color: #fff;
   width: 100%;
+  padding: 0 15px;
 }
 
 .site-nav-middle {
