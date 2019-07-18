@@ -18,7 +18,8 @@ footer.footer {
   background-color: #0a0a23;
   height: 70px;
   width: 100%;
-  position: relative;
+  display: flex;
+  flex-direction: row;
   color: #fff;
   border-top: 3px solid #fff;
   box-shadow: 0px 0px 4px #000;
@@ -47,6 +48,25 @@ footer.footer {
   position: absolute;
   right: 10px;
   top: 10px;
+}
+#metaDisplay {
+  width: calc(100% - 210px);
+}
+
+#playToggle {
+  height: 70px;
+  width: 70px;
+  background: blue;
+}
+#volUp {
+  height: 70px;
+  width: 70px;
+  background: purple;
+}
+#volDown {
+  height: 70px;
+  width: 70px;
+  background: teal;
 }
 
 #nowPlaying {
