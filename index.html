@@ -130,8 +130,9 @@
         </div>
       </div>
       <div id="playToggle"></div>
-        <div id="volUp"></div>
-        <div id="volDown"></div>
+      <div class="slider-container">
+        <input id="slider" type="range" min="0" max="100" value="50">
+      </div>
       `;
     footer.innerHTML = footerBlock;
 
@@ -146,7 +147,23 @@
 				</dl>`;
     details.innerHTML = detailsBlock;
     //start the show
+
     var fCC_Player = new CodeRadio();
+
+    function handleToggleButton() {
+      fCC_Player.togglePlay();
+    }
+
+    var slider = document.getElementById("slider");
+
+    slider.oninput = function() {
+      console.log(this.value);
+      console.log(fCC_Player.audioConfig.maxVolume);
+      fCC_Player.setTargetVolume(this.value / 100);
+    };
+
+    document.getElementById("playToggle").onclick = handleToggleButton;
+
     //bring in the animation
     container.className = "animation";
   }

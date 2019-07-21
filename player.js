@@ -168,8 +168,6 @@ class CodeRadio {
   setupEventListeners() {
     document.addEventListener("keydown", evt => this.keyboardControl(evt));
     document.getElementById("playToggle").onclick = this.handleToggleButton;
-    document.getElementById("volUp").onclick = this.handleVolUp;
-    document.getElementById("volDown").onclick = this.handleVolDown;
 
     // In order to get around some mobile browser limitations, we can only generate a lot
     // of the audio context stuff AFTER the audio has been triggered. We can't see it until
@@ -180,25 +178,6 @@ class CodeRadio {
         this.createVisualizer();
       }
     });
-  }
-
-  handleToggleButton() {
-    console.log("hello");
-    this.togglePlay();
-  }
-
-  handleVolUp() {
-    console.log("volUp");
-    this.setTargetVolume(
-      Math.min(this.audioConfig.maxVolume + this.audioConfig.volumeSteps, 1)
-    );
-  }
-
-  handleVolDown() {
-    console.log("volDown");
-    this.setTargetVolume(
-      Math.max(this.audioConfig.maxVolume - this.audioConfig.volumeSteps, 0)
-    );
   }
 
   keyboardControl(evt = {}) {
