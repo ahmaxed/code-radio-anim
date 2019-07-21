@@ -57,11 +57,18 @@ footer.footer {
   height: 70px;
   width: 70px;
   background: blue;
+  padding: 15px;
+}
+
+#playButton {
+  fill: white;
+  height: 40px;
+  width: 40px;
 }
 .slider-container {
   height: 70px;
   width: 140px;
-  background: purple;
+  padding: 30px 20px 30px 15px;
 }
 
 #slider {
@@ -70,7 +77,6 @@ footer.footer {
   height: 6px;
   background: #d3d3d3;
   outline: none;
-  margin: 32px 20px 32px 5px;
 }
 
 #nowPlaying {

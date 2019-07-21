@@ -129,7 +129,13 @@
           <div data-meta="listeners"></div>
         </div>
       </div>
-      <div id="playToggle"></div>
+      <div id="playToggle">
+        <img
+          id="playButton"
+          src="./images/pause.svg"
+          alt="Play Pause Button"
+        />
+        </div>
       <div class="slider-container">
         <input id="slider" type="range" min="0" max="100" value="50">
       </div>
@@ -140,28 +146,25 @@
     const details = document.getElementById("details");
     details.className = "details";
     var detailsBlock = `				
-	<summary>Keyboard Controls</summary>
-				<dl>
-					<dt>Play/Pause:</dt><dd>Spacebar or "k"</dd>
-					<dt>Volume:</dt><dd>Up Arrow / Down Arrow</dd>
-				</dl>`;
+      <summary>Keyboard Controls</summary>
+      <dl>
+        <dt>Play/Pause:</dt><dd>Spacebar or "k"</dd>
+        <dt>Volume:</dt><dd>Up Arrow / Down Arrow</dd>
+      </dl>`;
     details.innerHTML = detailsBlock;
     //start the show
 
     var fCC_Player = new CodeRadio();
 
-    function handleToggleButton() {
-      fCC_Player.togglePlay();
-    }
-
     var slider = document.getElementById("slider");
-
     slider.oninput = function() {
-      console.log(this.value);
-      console.log(fCC_Player.audioConfig.maxVolume);
       fCC_Player.setTargetVolume(this.value / 100);
     };
 
+    // play pause button logic
+    function handleToggleButton() {
+      fCC_Player.togglePlay();
+    }
     document.getElementById("playToggle").onclick = handleToggleButton;
 
     //bring in the animation
