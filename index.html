@@ -157,13 +157,12 @@
     var fCC_Player = new CodeRadio();
 
     var playButton = document.getElementById("playButton");
-    playButton.src = "./images/play.svg";
     console.log(fCC_Player._player.paused);
-    // if (fCC_Player._player.paused) {
-    //   console.log(fCC_Player._player.paused);
-    //   var playButton = document.getElementById("playButton");
-    //   playButton.src = "./images/play.svg";
-    // }
+    if (fCC_Player._player.paused) {
+      console.log(fCC_Player._player.play);
+      var playButton = document.getElementById("playButton");
+      playButton.src = "./images/play.svg";
+    }
 
     var slider = document.getElementById("slider");
     slider.oninput = function() {
