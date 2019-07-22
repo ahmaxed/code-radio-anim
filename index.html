@@ -106,8 +106,6 @@
     }
 
     callMaker();
-  } else {
-    container.className = "animation";
   }
 </script>
 
@@ -142,7 +140,7 @@
       `;
     footer.innerHTML = footerBlock;
 
-    //setup the details
+    //setup the info box for keyboard shortcuts
     const details = document.getElementById("details");
     details.className = "details";
     var detailsBlock = `
@@ -152,21 +150,16 @@
         <dt>Volume:</dt><dd>Up Arrow / Down Arrow</dd>
       </dl>`;
     details.innerHTML = detailsBlock;
-    //start the show
 
+    //start the show
     var fCC_Player = new CodeRadio();
 
-    var playButton = document.getElementById("playButton");
-    // console.log(fCC_Player._player.paused);
-    // if (fCC_Player._player.paused) {
-    //   var playButton = document.getElementById("playButton");
-    //   playButton.src = "./images/play.svg";
-    // }
-
+    // set the vol slider
     var slider = document.getElementById("slider");
     slider.oninput = function() {
       fCC_Player.setTargetVolume(this.value / 100);
     };
+
     // play pause button logic
     function handleToggleButton() {
       var playButton = document.getElementById("playButton");
