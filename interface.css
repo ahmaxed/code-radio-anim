@@ -46,18 +46,23 @@ footer.footer {
 
 [data-meta="listeners"] {
   position: absolute;
-  right: 10px;
-  top: 10px;
+  right: 15px;
+  top: 18px;
+  font-size: 20px;
 }
 #metaDisplay {
   width: calc(100% - 210px);
 }
 
-#playToggle {
+#playContainer {
   height: 70px;
   width: 70px;
-  background: blue;
   padding: 15px;
+  cursor: pointer;
+}
+
+#playContainer:hover {
+  background: #2a2a40;
 }
 
 #playButton {
@@ -77,6 +82,22 @@ footer.footer {
   height: 6px;
   background: #d3d3d3;
   outline: none;
+}
+
+#slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 15px;
+  height: 15px;
+  background: white;
+  cursor: pointer;
+}
+
+#slider::-moz-range-thumb {
+  width: 15px;
+  height: 15px;
+  background: white;
+  cursor: pointer;
 }
 
 #nowPlaying {
