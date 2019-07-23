@@ -149,7 +149,7 @@
         />
         </div>
       <div class="slider-container">
-        <input id="slider" type="range" min="0" max="100" value="50">
+        <input id="slider" type="range" min="0" max="10" value="5">
       </div>
       `;
     footer.innerHTML = footerBlock;
@@ -167,27 +167,32 @@
 
     //start the show
     var fCC_Player = new CodeRadio();
-
     var playButton = document.getElementById("playButton");
+    var slider = document.getElementById("slider");
 
+    // set button initial state
     if (fCC_Player._player.paused) {
       playButton.src = "./images/play.svg";
     }
 
     // set the vol slider
-    var slider = document.getElementById("slider");
     slider.oninput = function() {
-      fCC_Player.setTargetVolume(this.value / 100);
+      fCC_Player.setTargetVolume(this.value / 10);
     };
 
     fCC_Player._player.onplay = function() {
-      console.log("play");
       playButton.src = "./images/pause.svg";
     };
 
     fCC_Player._player.onpause = function() {
-      console.log("pause");
       playButton.src = "./images/play.svg";
+    };
+
+    fCC_Player._player.onvolumechange = function() {
+      console.log(Math.round(fCC_Player._player.volume * 10));
+
+      slider.value = Math.round(fCC_Player._player.volume * 10);
+      console.log(slider.value / 10);
     };
 
     // play pause button condition

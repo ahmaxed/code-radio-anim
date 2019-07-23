@@ -166,8 +166,7 @@ class CodeRadio {
    * Yay, let's get some keyboard shortcuts in this tool
    */
   setupEventListeners() {
-    // commented for now to find a good way to communicate with slier on index.html
-    //document.addEventListener("keydown", evt => this.keyboardControl(evt));
+    document.addEventListener("keydown", evt => this.keyboardControl(evt));
 
     // In order to get around some mobile browser limitations, we can only generate a lot
     // of the audio context stuff AFTER the audio has been triggered. We can't see it until
