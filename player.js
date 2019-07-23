@@ -1,3 +1,13 @@
+const _events = Symbol('events'),
+  _url = Symbol('url'),
+  _player = Symbol('player'),
+  _alternateMounts = Symbol('alternateMounts'),
+  _currentSong = Symbol('currentSong'),
+  _songStartedAt = Symbol('songStartedAt')
+  _songDuration = Symbol('songDuration'),
+  _progressInterval = Symbol('progressInterval'),
+  _listeners = Symbol('listeners');
+
 class CodeRadio {
   constructor() {
     /***
@@ -39,19 +49,21 @@ class CodeRadio {
      * to it being a single audio element, there should be
      * no memory leaks of extra floating audio elements.
      */
-    this._url = "";
-    this._player = new Audio();
-    this._player.volume = this.audioConfig.maxVolume;
-    this._player.crossOrigin = "anonymous";
+    this[_url] = "";
+    this[_alternateMounts] = [];
+    this[_player] = new Audio();
+    this[_player].volume = this.audioConfig.maxVolume;
+    this[_player].crossOrigin = "anonymous";
     // Note: the crossOrigin is needed to fix a CORS JavaScript requirement
 
     /***
      * There are a few *private* variables used
      */
-    this._currentSong = {};
-    this._songStartedAt = 0;
-    this._songDuration = 0;
-    this._progressInterval = false;
+    this[_currentSong] = {};
+    this[_songStartedAt] = 0;
+    this[_songDuration] = 0;
+    this[_progressInterval] = false;
+    this[_listeners] = 0;
 
     this.getNowPlaying();
 
@@ -74,15 +86,23 @@ class CodeRadio {
    * resets the URL.
    */
   set url(url = false) {
-    if (url && this._url === "") {
-      this._url = url;
-      this._player.src = url;
-      this._player.play();
+    if (url && this[_url] === "") {
+      this[_url] = url;
+      this[_player].src = url;
+      this[_player].play();
     }
   }
 
   get url() {
-    return this._url;
+    return this[_url];
+  }
+
+  set mounts(mounts = []) {
+    this[_alternateMounts] = mounts;
+  }
+
+  get mounts() {
+    return this[_alternateMounts];
   }
 
   /***
@@ -91,12 +111,11 @@ class CodeRadio {
    * the metadata is updated.
    */
   set currentSong(songData = {}) {
-    this._currentSong = songData;
-    this.renderMetadata();
+    throw new Error('You cannot set the value of a readonly attribute');
   }
 
   get currentSong() {
-    return this._currentSong;
+    return this[_currentSong];
   }
 
   /***
@@ -104,21 +123,28 @@ class CodeRadio {
    * duration for the max of the meter and set the played at to 0
    */
   set played_at(t = 0) {
-    this._songStartedAt = t * 1000; // Time comes in a seconds so we multiply by 1000 to set millis
+    this[_songStartedAt] = t * 1000; // Time comes in a seconds so we multiply by 1000 to set millis
     this.meta.duration.value = 0;
   }
 
   get played_at() {
-    return this._songStartedAt;
+    return this[_songStartedAt];
   }
 
   set duration(d = 0) {
-    this._songDuration = d;
-    this.meta.duration.max = this._songDuration;
+    throw new Error('You cannot set the value of a readonly attribute');
   }
 
   get duration() {
-    return this._songDuration;
+    return this[_songDuration];
+  }
+
+  set listeners(v = 0) {
+    throw new Error('You cannot set the value of a readonly attribute');
+  }
+
+  get listeners() {
+    return this[_listeners];
   }
 
   getNowPlaying() {
@@ -129,26 +155,25 @@ class CodeRadio {
         np = np[0]; // There is only ever 1 song "Now Playing" so let's simplify the response
 
         // We look through the available mounts to find the default mount (or just the listen_url)
-        if (this.url === "")
+        if (this.url === "") {
           this.url = np.station.mounts.find(mount => !!mount.is_default).url;
+          this.mounts = np.station.mounts;
+        }
 
         // We only need to update th metadata if the song has been changed
-        if (
-          !this.currentSong.id ||
-          np.now_playing.song.id !== this.currentSong.id
-        ) {
-          this.currentSong = np.now_playing.song;
-          this.played_at = np.now_playing.played_at;
-          this.duration = np.now_playing.duration;
-          this.meta.listeners.textContent = `coders listening right now: ${
-            np.listeners.current
-          }`;
-          if (!this._progressInterval) {
-            this._progressInterval = setInterval(
-              () => this.updateProgress(),
-              100
-            );
+        if (np.now_playing.song.id !== this.currentSong.id) {
+          this[_currentSong] = np.now_playing.song;
+          this[_songStartedAt] = t * 1000; = np.now_playing.played_at;
+          this[_songDuration] = np.now_playing.duration;
+          if (this[_listeners] !== np.listeners.current) {
+            this[_listeners] = np.listeners.current;
+            this.emit('listeners', this[_listeners]);
           }
+
+          this.meta.duration.max = this[_songDuration];
+          this.meta.duration.value = 0;
+          this.emit('newSong', this[_currentSong]);
+          if (!this[_progressInterval]) this[_progressInterval] = setInterval(() => this.updateProgress(), 100);
         }
 
         // Since the server doesn't have a socket connection (yet), we need to long poll it for the current song
@@ -169,7 +194,7 @@ class CodeRadio {
     // In order to get around some mobile browser limitations, we can only generate a lot
     // of the audio context stuff AFTER the audio has been triggered. We can't see it until
     // then anyway so it makes no difference to desktop.
-    this._player.addEventListener("play", () => {
+    this[_player].addEventListener("play", () => {
       if (!this.eq.context) {
         this.initiateEQ();
         this.createVisualizer();
@@ -186,14 +211,10 @@ class CodeRadio {
         this.togglePlay();
         break;
       case "ArrowUp":
-        this.setTargetVolume(
-          Math.min(this.audioConfig.maxVolume + this.audioConfig.volumeSteps, 1)
-        );
+        this.setTargetVolume(Math.min(this.audioConfig.maxVolume + this.audioConfig.volumeSteps, 1));
         break;
       case "ArrowDown":
-        this.setTargetVolume(
-          Math.max(this.audioConfig.maxVolume - this.audioConfig.volumeSteps, 0)
-        );
+        this.setTargetVolume(Math.max(this.audioConfig.maxVolume - this.audioConfig.volumeSteps, 0));
         break;
     }
   }
@@ -203,7 +224,7 @@ class CodeRadio {
     this.eq.context = new AudioContext();
 
     // Apply the audio element as the source where to pull all the data from
-    this.eq.src = this.eq.context.createMediaElementSource(this._player);
+    this.eq.src = this.eq.context.createMediaElementSource(this[_player]);
 
     // Use some amazing trickery that allows javascript to analyse the current state
     this.eq.analyser = this.eq.context.createAnalyser();
@@ -261,12 +282,7 @@ class CodeRadio {
 
     let y,
       x = 0; // Intial bar x coordinate
-    this.visualizer.ctx.clearRect(
-      0,
-      0,
-      this.visualizer.width,
-      this.visualizer.height
-    ); // Clear the complete canvas
+    this.visualizer.ctx.clearRect(0, 0, this.visualizer.width, this.visualizer.height); // Clear the complete canvas
     this.visualizer.ctx.fillStyle = this.config.translucent; // Set the primary colour of the brand (probably moving to a higher object level variable soon)
     this.visualizer.ctx.beginPath(); // Start creating a canvas polygon
     this.visualizer.ctx.moveTo(x, 0); // Start at the bottom left
@@ -281,16 +297,18 @@ class CodeRadio {
   }
 
   play() {
-    if (this._player.paused) {
-      this._player.volume = 0;
-      this._player.play();
+    if (this[_player].paused) {
+      this[_player].volume = 0;
+      this[_player].play();
+      this.emit('play');
       this.fadeUp();
       return this;
     }
   }
 
   pause() {
-    this._player.pause();
+    this[_player].pause();
+    this.emit('pause');
     return this;
   }
 
@@ -301,31 +319,24 @@ class CodeRadio {
    */
   togglePlay() {
     // If there already is a source, confirm it’s playing or not
-    if (!!this._player.src) {
+    if (!!this[_player].src) {
       // If the player is paused, set the volume to 0 and fade up
-      if (this._player.paused) {
-        this._player.volume = 0;
-        this._player.play();
-        this.fadeUp();
-
+      if (this[_player].paused) this.play();
         // if it is already playing, fade the music out (resulting in a pause)
-      } else this.fade();
+      else this.fade();
     }
 
     return this;
   }
 
   setTargetVolume(v) {
-    this.audioConfig.maxVolume = parseFloat(
-      Math.max(0, Math.min(1, v).toFixed(1))
-    );
-    this._player.volume = this.audioConfig.maxVolume;
+    this.audioConfig.maxVolume = parseFloat(Math.max(0, Math.min(1, v).toFixed(1)));
+    this[_player].volume = this.audioConfig.maxVolume;
   }
 
   // Simple fade command to initiate the playing and pausing in a more fluid method
   fade(direction = "down") {
-    this.audioConfig.targetVolume =
-      direction.toLowerCase() === "up" ? this.audioConfig.maxVolume : 0;
+    this.audioConfig.targetVolume = direction.toLowerCase() === "up" ? this.audioConfig.maxVolume : 0;
     this.updateVolume();
     return this;
   }
@@ -341,50 +352,75 @@ class CodeRadio {
   // In order to have nice fading, this method adjusts the volume dynamically over time.
   updateVolume() {
     // In order to fix floating math issues, we set the toFixed in order to avoid 0.999999999999 increments
-    let currentVolume = parseFloat(this._player.volume.toFixed(1));
+    let currentVolume = parseFloat(this[_player].volume.toFixed(1));
 
     // If the volume is correctly set to the target, no need to change it
     if (currentVolume === this.audioConfig.targetVolume) {
       // If the audio is set to 0 and it’s been met, pause the audio
-      if (this.audioConfig.targetVolume === 0) this._player.pause();
+      if (this.audioConfig.targetVolume === 0) this[_player].pause();
 
       // Unmet audio volume settings require it to be changed
     } else {
       // We capture the value of the next increment by either the configuration or the difference between the current and target if it's smaller than the increment
-      let volumeNextIncrement = Math.min(
-        this.audioConfig.volumeSteps,
-        Math.abs(this.audioConfig.targetVolume - this._player.volume)
-      );
+      let volumeNextIncrement = Math.min(this.audioConfig.volumeSteps, Math.abs(this.audioConfig.targetVolume - this[_player].volume));
 
       // Adjust the audio based on if the target is higher or lower than the current
-      this._player.volume +=
-        this.audioConfig.targetVolume > this._player.volume
+      this[_player].volume +=
+        this.audioConfig.targetVolume > this[_player].volume
           ? volumeNextIncrement
           : -volumeNextIncrement;
+      
+      this.emit('volumeChange', this[_player].volume);
 
       // The speed at which the audio lowers is also controlled.
-      setTimeout(
-        () => this.updateVolume(),
-        this.audioConfig.volumeTransitionSpeed
-      );
+      setTimeout(() => this.updateVolume(), this.audioConfig.volumeTransitionSpeed);
     }
   }
 
   renderMetadata() {
-    if (!!this._currentSong.art) {
-      this.meta.picture.style.backgroundImage = `url(${this._currentSong.art})`;
+    if (!!this[_currentSong].art) {
+      this.meta.picture.style.backgroundImage = `url(${this[_currentSong].art})`;
       this.meta.container.classList.add("thumb");
     } else {
       this.meta.container.classList.remove("thumb");
       this.meta.picture.style.backgroundImage = "";
     }
-    this.meta.title.textContent = this._currentSong.title;
-    this.meta.artist.textContent = this._currentSong.artist;
-    this.meta.album.textContent = this._currentSong.album;
+    this.meta.title.textContent = this[_currentSong].title;
+    this.meta.artist.textContent = this[_currentSong].artist;
+    this.meta.album.textContent = this[_currentSong].album;
   }
 
   updateProgress() {
-    this.meta.duration.value =
-      (new Date().valueOf() - this._songStartedAt) / 1000;
+    this.meta.duration.value = (new Date().valueOf() - this[_songStartedAt]) / 1000;
+  }
+    
+  on(trigger, fn, once = false) {
+    if (typeof fn != 'function') throw new Error(`Invalid Listener: ${trigger}. Must be a function`);
+    if (!this[_events]) this[_events] = {};
+    if (!this[_events][trigger]) this[_events][trigger] = new Array();
+    this[_events][trigger].push({
+      listener: fn,
+      once: !!once
+    });
+  }
+
+  once(trigger, fn) { 
+    this.on(trigger, fn, true);
+  }
+
+  off(trigger, fn) {
+    if (!this[_events] || !this[_events][trigger]) return;
+    this[_events][trigger] = this[_events][trigger].map(evt => (evt !== fn));
+  }
+
+  emit(trigger, data) {
+      return new Promise((resolve, reject) => {
+        if (!this[_events] || !this[_events][trigger]) return;
+        this[_events][trigger].forEach((evt, i) => {
+          evt.listener(data);
+          if (evt.once) this[_events][trigger].splice(i, 1);
+        });
+        resolve();
+      });
   }
 }

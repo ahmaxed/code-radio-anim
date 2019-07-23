@@ -131,8 +131,8 @@
   if (window.mobilecheck() === false) {
     //set up the footer
     const footer = document.getElementById("footer");
-    footer.className = "footer";
-    var footerBlock = `
+    footer.classList.add("footer");
+    footer.innerHTML = `
       <div id="metaDisplay">
         <div data-meta="picture"></div>
         <div id="nowPlaying">
@@ -154,54 +154,33 @@
         <input id="slider" type="range" min="0" max="10" value="0">
       </div>
       `;
-    footer.innerHTML = footerBlock;
 
     //setup the info box for keyboard shortcuts
     const details = document.getElementById("details");
-    details.className = "details";
-    var detailsBlock = `
+    details.classList.add('details');
+    details.innerHTML = `
       <summary>Keyboard Controls</summary>
       <dl>
         <dt>Play/Pause:</dt><dd>Spacebar or "k"</dd>
         <dt>Volume:</dt><dd>Up Arrow / Down Arrow</dd>
       </dl>`;
-    details.innerHTML = detailsBlock;
 
     //start the show
-    var fCC_Player = new CodeRadio();
-    var playButton = document.getElementById("playButton");
-    var slider = document.getElementById("slider");
-
-    // set button initial state
-    if (fCC_Player._player.paused) {
-      playButton.src =
-        "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
-    }
+    var fCC_Player = new CodeRadio(),
+      playButton = document.getElementById("playButton"),
+      slider = document.getElementById("slider"),
+      playContainer = document.getElementById("playContainer");
 
     // set the vol slider
-    slider.oninput = function() {
-      fCC_Player.setTargetVolume(this.value / 10);
-    };
-
-    fCC_Player._player.onplay = function() {
-      playButton.src =
-        "https://cdn-media-1.freecodecamp.org/code-radio/pause.svg";
-    };
-
-    fCC_Player._player.onpause = function() {
-      playButton.src =
-        "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
-    };
-
-    fCC_Player._player.onvolumechange = function() {
-      slider.value = Math.round(fCC_Player._player.volume * 10);
-    };
-
+    slider.addEventListener('input', () => fCC_Player.setTargetVolume(slider.value / 10));
     // play pause button condition
-    function handleToggleButton() {
-      fCC_Player.togglePlay();
-    }
-    document.getElementById("playContainer").onclick = handleToggleButton;
+    playContainer.addEventListener('click', () => fCC_Player.togglePlay());
+
+    fCC_Player.on('play', () => playButton.src = "https://cdn-media-1.freecodecamp.org/code-radio/pause.svg");
+    fCC_Player.on('pause', () => playButton.src = "https://cdn-media-1.freecodecamp.org/code-radio/play.svg");
+    fCC_Player.on('volumeChange', (volume) => slider.value = Math.round(volume * 10));
+    fCC_Player.on('newSong', (songData) => fCC_Player.renderMetadata());
+    fCC_Player.on('listeners', (count) => document.querySelector('[data-meta="listeners"]').textContent = `coders listening right now: ${np.listeners.current}`);
 
     //bring in the animation
     container.className = "animation";
