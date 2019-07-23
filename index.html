@@ -168,20 +168,30 @@
     //start the show
     var fCC_Player = new CodeRadio();
 
+    var playButton = document.getElementById("playButton");
+
+    if (fCC_Player._player.paused) {
+      playButton.src = "./images/play.svg";
+    }
+
     // set the vol slider
     var slider = document.getElementById("slider");
     slider.oninput = function() {
       fCC_Player.setTargetVolume(this.value / 100);
     };
 
+    fCC_Player._player.onplay = function() {
+      console.log("play");
+      playButton.src = "./images/pause.svg";
+    };
+
+    fCC_Player._player.onpause = function() {
+      console.log("pause");
+      playButton.src = "./images/play.svg";
+    };
+
     // play pause button condition
     function handleToggleButton() {
-      var playButton = document.getElementById("playButton");
-      if (fCC_Player._player.paused) {
-        playButton.src = "./images/pause.svg";
-      } else {
-        playButton.src = "./images/play.svg";
-      }
       fCC_Player.togglePlay();
     }
     document.getElementById("playContainer").onclick = handleToggleButton;
