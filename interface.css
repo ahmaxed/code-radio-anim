@@ -439,7 +439,7 @@ p {
 .middle {
   display: flex;
   flex-direction: column;
-  margin-top: 10vw;
+  margin-top: 200;
   width: 90%;
   max-width: 500px;
   background: #f5f6f7;

@@ -68,6 +68,7 @@
 </script>
 
 <script>
+  //check for mobile and add related dom nodes
   if (window.mobilecheck()) {
     const container = document.getElementById("container");
     container.innerHTML = `
@@ -82,7 +83,7 @@
       <p id="listeners-num"></p>
     </div>`;
 
-    //update the listener numb
+    //call api and update the listener numbber
     var xhr = new XMLHttpRequest();
 
     function reqListener() {
@@ -112,6 +113,7 @@
 <script src="./player.js"></script>
 
 <script type="text/javascript">
+  //check for desktop
   if (window.mobilecheck() === false) {
     //set up the footer
     const footer = document.getElementById("footer");
@@ -160,7 +162,7 @@
       fCC_Player.setTargetVolume(this.value / 100);
     };
 
-    // play pause button logic
+    // play pause button condition
     function handleToggleButton() {
       var playButton = document.getElementById("playButton");
       if (fCC_Player._player.paused) {
