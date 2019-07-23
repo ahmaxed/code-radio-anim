@@ -189,10 +189,7 @@
     };
 
     fCC_Player._player.onvolumechange = function() {
-      console.log(Math.round(fCC_Player._player.volume * 10));
-
       slider.value = Math.round(fCC_Player._player.volume * 10);
-      console.log(slider.value / 10);
     };
 
     // play pause button condition
