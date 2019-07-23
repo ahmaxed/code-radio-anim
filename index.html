@@ -3,7 +3,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="./interface.css" rel="stylesheet" type="text/css" />
     <title>Code Radio</title>
-    <link rel="icon" type="image/png" href="./images/favicon.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://cdn-media-1.freecodecamp.org/code-radio/favicon.png"
+    />
     <script
       async
       src="https://www.googletagmanager.com/gtag/js?id=UA-55446531-21"
@@ -111,10 +115,8 @@
 
     function callMaker() {
       xhr.addEventListener("load", reqListener);
-      xhr.open(
-        "GET",
-        "https://coderadio-admin.freecodecamp.org/api/nowplaying"
-      );
+      xhr.open("GET", "/app/api/nowplaying");
+
       xhr.send();
     }
 
@@ -144,12 +146,12 @@
       <div id="playContainer">
         <img
           id="playButton"
-          src="./images/pause.svg"
+          src="https://cdn-media-1.freecodecamp.org/code-radio/puse.svg"
           alt="Play Pause Button"
         />
         </div>
       <div class="slider-container">
-        <input id="slider" type="range" min="0" max="10" value="5">
+        <input id="slider" type="range" min="0" max="10" value="0">
       </div>
       `;
     footer.innerHTML = footerBlock;
@@ -172,7 +174,8 @@
 
     // set button initial state
     if (fCC_Player._player.paused) {
-      playButton.src = "./images/play.svg";
+      playButton.src =
+        "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
     }
 
     // set the vol slider
@@ -181,11 +184,13 @@
     };
 
     fCC_Player._player.onplay = function() {
-      playButton.src = "./images/pause.svg";
+      playButton.src =
+        "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
     };
 
     fCC_Player._player.onpause = function() {
-      playButton.src = "./images/play.svg";
+      playButton.src =
+        "https://cdn-media-1.freecodecamp.org/code-radio/pause.svg";
     };
 
     fCC_Player._player.onvolumechange = function() {

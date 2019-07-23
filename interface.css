@@ -147,7 +147,7 @@ footer.footer {
 }
 
 .animation {
-  background-image: url("./images/bg.png");
+  background-image: url("https://cdn-media-1.freecodecamp.org/code-radio/bg.png");
   background-position: left bottom;
   background-repeat: no-repeat;
   position: relative;
@@ -157,7 +157,7 @@ footer.footer {
 
 .animation::before {
   content: "";
-  background-image: url("./images/Saron3.gif");
+  background-image: url("https://cdn-media-1.freecodecamp.org/code-radio/Saron3.gif");
   left: 388px;
   bottom: 0px;
   width: 509px;
