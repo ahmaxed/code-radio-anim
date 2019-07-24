@@ -172,7 +172,7 @@ class CodeRadio {
     document.addEventListener("keydown", evt => this.keyboardControl(evt));
 
     this.meta.dropdown.addEventListener("change", evt =>
-      console.log(evt.target.value)
+      this.handleDropdownChange(evt)
     );
     // In order to get around some mobile browser limitations, we can only generate a lot
     // of the audio context stuff AFTER the audio has been triggered. We can't see it until
@@ -183,6 +183,17 @@ class CodeRadio {
         this.createVisualizer();
       }
     });
+  }
+
+  handleDropdownChange(evt = {}) {
+    let target = evt.target.value;
+    let value = this._streams.forEach(stream => {
+      if (stream.value === target) {
+        this._url = stream.url;
+        this.play();
+      }
+    });
+    evt.target.value;
   }
 
   keyboardControl(evt = {}) {
