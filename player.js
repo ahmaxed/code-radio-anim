@@ -43,10 +43,8 @@ class CodeRadio {
     this._player = new Audio();
     this._player.volume = this.audioConfig.maxVolume;
     this._player.crossOrigin = "anonymous";
-    // Note: the crossOrigin is needed to fix a CORS JavaScript requirement
-
-    // here are all the streams
     this._streams = [];
+    // Note: the crossOrigin is needed to fix a CORS JavaScript requirement
 
     /***
      * There are a few *private* variables used
@@ -136,10 +134,11 @@ class CodeRadio {
           this.url = np.station.mounts.find(mount => !!mount.is_default).url;
           if (np.station.remote) {
           }
+          this.streams = np.station.mounts.concat(np.station.remotes);
         }
 
-        console.log(this.url);
-        console.log(this._url);
+        console.log(this.streams);
+        console.log(this._streams);
 
         // We only need to update th metadata if the song has been changed
         if (
@@ -149,9 +148,7 @@ class CodeRadio {
           this.currentSong = np.now_playing.song;
           this.played_at = np.now_playing.played_at;
           this.duration = np.now_playing.duration;
-          this.meta.listeners.textContent = `coders listening right now: ${
-            np.listeners.current
-          }`;
+          this.meta.listeners.textContent = `${np.listeners.current}`;
           if (!this._progressInterval) {
             this._progressInterval = setInterval(
               () => this.updateProgress(),
