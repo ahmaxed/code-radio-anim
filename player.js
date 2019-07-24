@@ -3,22 +3,24 @@ const _events = Symbol('events'),
   _player = Symbol('player'),
   _alternateMounts = Symbol('alternateMounts'),
   _currentSong = Symbol('currentSong'),
-  _songStartedAt = Symbol('songStartedAt')
+  _songStartedAt = Symbol('songStartedAt'),
   _songDuration = Symbol('songDuration'),
   _progressInterval = Symbol('progressInterval'),
-  _listeners = Symbol('listeners');
+  _listeners = Symbol('listeners'),
+  _audioConfig = Symbol('audioConfig'),
+  _fastConnection = Symbol('fastConnection');
 
-class CodeRadio {
+export class CodeRadio {
+
   constructor() {
     /***
      * General configuration options
      */
     this.config = {
-      baseColour: "rgb(10, 10, 35)",
-      translucent: "rgba(10, 10, 35, 0.6)",
-      multiplier: 0.7529,
       metadataTimer: 2000
     };
+
+    this[_fastConnection] = (!!navigator.connection) ? (navigator.connection.downlink > 1.5) : false;
 
     /***
      * The equalizer data is held as a seperate data set
@@ -37,7 +39,7 @@ class CodeRadio {
 
     // Some basic configuration for nicer audio transitions
     // (Used in earlier projects and just maintained)
-    this.audioConfig = {
+    this[_audioConfig] = {
       targetVolume: 0,
       maxVolume: 0.5,
       volumeSteps: 0.1,
@@ -52,7 +54,7 @@ class CodeRadio {
     this[_url] = "";
     this[_alternateMounts] = [];
     this[_player] = new Audio();
-    this[_player].volume = this.audioConfig.maxVolume;
+    this[_player].volume = this[_audioConfig].maxVolume;
     this[_player].crossOrigin = "anonymous";
     // Note: the crossOrigin is needed to fix a CORS JavaScript requirement
 
@@ -67,17 +69,7 @@ class CodeRadio {
 
     this.getNowPlaying();
 
-    this.meta = {
-      container: document.getElementById("nowPlaying"),
-      picture: document.querySelector('[data-meta="picture"]'),
-      title: document.querySelector('[data-meta="title"]'),
-      artist: document.querySelector('[data-meta="artist"]'),
-      album: document.querySelector('[data-meta="album"]'),
-      duration: document.querySelector('[data-meta="duration"]'),
-      listeners: document.querySelector('[data-meta="listeners"]')
-    };
-
-    this.setupEventListeners();
+    document.addEventListener("keydown", evt => this.keyboardControl(evt));
   }
 
   /***
@@ -86,7 +78,7 @@ class CodeRadio {
    * resets the URL.
    */
   set url(url = false) {
-    if (url && this[_url] === "") {
+    if (url) {
       this[_url] = url;
       this[_player].src = url;
       this[_player].play();
@@ -97,8 +89,20 @@ class CodeRadio {
     return this[_url];
   }
 
-  set mounts(mounts = []) {
-    this[_alternateMounts] = mounts;
+  get player() {
+    return this[_player];
+  }
+
+  set player(v) {
+    throw new Error('You cannot set the value of a readonly attribute');
+  }
+
+  set mounts(mounts) {
+    throw new Error('You cannot set the value of a readonly attribute');
+  }
+
+  set mount(mount) {
+    this.url = mount;
   }
 
   get mounts() {
@@ -122,12 +126,11 @@ class CodeRadio {
    * In order to get the constant durations, we simply take the
    * duration for the max of the meter and set the played at to 0
    */
-  set played_at(t = 0) {
-    this[_songStartedAt] = t * 1000; // Time comes in a seconds so we multiply by 1000 to set millis
-    this.meta.duration.value = 0;
+  set playedAt(t = 0) {
+    throw new Error('You cannot set the value of a readonly attribute');
   }
 
-  get played_at() {
+  get playedAt() {
     return this[_songStartedAt];
   }
 
@@ -147,6 +150,19 @@ class CodeRadio {
     return this[_listeners];
   }
 
+  get playing() {
+    return this[_player].playing;
+  }
+
+  setMountToConnection() {
+    this[_fastConnection] = (!!navigator.connection) ? (navigator.connection.downlink > 1.5) : false;
+    if (this[_fastConnection]) {
+      this.url = this.mounts.find(mount => !!mount.is_default).url;
+    } else {
+      this.url = this.mounts.find(mount => mount.bitrate < this.mounts.find(m => !!m.is_default).bitrate).url || this.mounts.find(mount => !!mount.is_default).url;
+    }
+  }
+
   getNowPlaying() {
     // To prevent browser based caching, we add the date to the request, it won't impact the response
     fetch(`/app/api/nowplaying?t=${new Date().valueOf()}`)
@@ -156,24 +172,20 @@ class CodeRadio {
 
         // We look through the available mounts to find the default mount (or just the listen_url)
         if (this.url === "") {
-          this.url = np.station.mounts.find(mount => !!mount.is_default).url;
-          this.mounts = np.station.mounts;
+          this[_alternateMounts] = np.station.mounts;
+          this.setMountToConnection();
         }
 
         // We only need to update th metadata if the song has been changed
         if (np.now_playing.song.id !== this.currentSong.id) {
           this[_currentSong] = np.now_playing.song;
-          this[_songStartedAt] = t * 1000; = np.now_playing.played_at;
+          this[_songStartedAt] = np.now_playing.played_at * 1000;
           this[_songDuration] = np.now_playing.duration;
           if (this[_listeners] !== np.listeners.current) {
             this[_listeners] = np.listeners.current;
             this.emit('listeners', this[_listeners]);
           }
-
-          this.meta.duration.max = this[_songDuration];
-          this.meta.duration.value = 0;
           this.emit('newSong', this[_currentSong]);
-          if (!this[_progressInterval]) this[_progressInterval] = setInterval(() => this.updateProgress(), 100);
         }
 
         // Since the server doesn't have a socket connection (yet), we need to long poll it for the current song
@@ -185,23 +197,6 @@ class CodeRadio {
       });
   }
 
-  /***
-   * Yay, let's get some keyboard shortcuts in this tool
-   */
-  setupEventListeners() {
-    document.addEventListener("keydown", evt => this.keyboardControl(evt));
-
-    // In order to get around some mobile browser limitations, we can only generate a lot
-    // of the audio context stuff AFTER the audio has been triggered. We can't see it until
-    // then anyway so it makes no difference to desktop.
-    this[_player].addEventListener("play", () => {
-      if (!this.eq.context) {
-        this.initiateEQ();
-        this.createVisualizer();
-      }
-    });
-  }
-
   keyboardControl(evt = {}) {
     // Quick note: if you're wanting to do similar in your projects, keyCode use to be the
     // standard however it is being depricated for the key attribute
@@ -211,89 +206,12 @@ class CodeRadio {
         this.togglePlay();
         break;
       case "ArrowUp":
-        this.setTargetVolume(Math.min(this.audioConfig.maxVolume + this.audioConfig.volumeSteps, 1));
+        this.setTargetVolume(Math.min(this[_audioConfig].maxVolume + this[_audioConfig].volumeSteps, 1));
         break;
       case "ArrowDown":
-        this.setTargetVolume(Math.max(this.audioConfig.maxVolume - this.audioConfig.volumeSteps, 0));
+        this.setTargetVolume(Math.max(this[_audioConfig].maxVolume - this[_audioConfig].volumeSteps, 0));
         break;
     }
-  }
-
-  initiateEQ() {
-    // Create a new Audio Context element to read the samples from
-    this.eq.context = new AudioContext();
-
-    // Apply the audio element as the source where to pull all the data from
-    this.eq.src = this.eq.context.createMediaElementSource(this[_player]);
-
-    // Use some amazing trickery that allows javascript to analyse the current state
-    this.eq.analyser = this.eq.context.createAnalyser();
-    this.eq.src.connect(this.eq.analyser);
-    this.eq.analyser.connect(this.eq.context.destination);
-    this.eq.analyser.fftSize = 256;
-
-    // Create a buffer array for the number of frequencies available (minus the high pitch useless ones that never really do anything anyway)
-    this.eq.bands = new Uint8Array(this.eq.analyser.frequencyBinCount - 32);
-    this.updateEQBands();
-  }
-
-  /***
-   * The equalizer bands available need to be updated
-   * constantly in order to ensure that the value for any
-   * visualizer is up to date.
-   */
-  updateEQBands() {
-    // Populate the buffer with the audio source’s current data
-    this.eq.analyser.getByteFrequencyData(this.eq.bands);
-
-    // Can’t stop, won’t stop
-    requestAnimationFrame(() => this.updateEQBands());
-  }
-
-  /***
-   * When starting the page, the visualizer dom is needed to be
-   * created.
-   */
-  createVisualizer() {
-    let container = document.createElement("canvas");
-    document.getElementById("visualizer").appendChild(container);
-    container.width = container.parentNode.offsetWidth;
-    container.height = container.parentNode.offsetHeight;
-
-    this.visualizer = {
-      ctx: container.getContext("2d"),
-      height: container.height,
-      width: container.width,
-      barWidth: container.width / this.eq.bands.length
-    };
-
-    this.drawVisualizer();
-  }
-
-  /***
-   * As a base visualizer, the equalizer bands are drawn using
-   * canvas in the window directly above the song into.
-   */
-  drawVisualizer() {
-    if (this.eq.bands.reduce((a, b) => a + b, 0) !== 0)
-      requestAnimationFrame(() => this.drawVisualizer());
-    // Because timeupdate events are not triggered at browser speed, we use requestanimationframe for higher framerates
-    else setTimeout(() => this.drawVisualizer(), 250); // If there is no music or audio in the song, then reduce the FPS
-
-    let y,
-      x = 0; // Intial bar x coordinate
-    this.visualizer.ctx.clearRect(0, 0, this.visualizer.width, this.visualizer.height); // Clear the complete canvas
-    this.visualizer.ctx.fillStyle = this.config.translucent; // Set the primary colour of the brand (probably moving to a higher object level variable soon)
-    this.visualizer.ctx.beginPath(); // Start creating a canvas polygon
-    this.visualizer.ctx.moveTo(x, 0); // Start at the bottom left
-    this.eq.bands.forEach(band => {
-      y = this.config.multiplier * band; // Get the overall hight associated to the current band and convert that into a Y position on the canvas
-      this.visualizer.ctx.lineTo(x, y); // Draw a line from the current position to the wherever the Y position is
-      this.visualizer.ctx.lineTo(x + this.visualizer.barWidth, y); // Continue that line to meet the width of the bars (canvas width ÷ bar count)
-      x += this.visualizer.barWidth; // Add pixels to the x for the next bar
-    });
-    this.visualizer.ctx.lineTo(x, 0); // Bring the line back down to the bottom of the canvas
-    this.visualizer.ctx.fill(); // Fill it
   }
 
   play() {
@@ -330,13 +248,13 @@ class CodeRadio {
   }
 
   setTargetVolume(v) {
-    this.audioConfig.maxVolume = parseFloat(Math.max(0, Math.min(1, v).toFixed(1)));
-    this[_player].volume = this.audioConfig.maxVolume;
+    this[_audioConfig].maxVolume = parseFloat(Math.max(0, Math.min(1, v).toFixed(1)));
+    this[_player].volume = this[_audioConfig].maxVolume;
   }
 
   // Simple fade command to initiate the playing and pausing in a more fluid method
   fade(direction = "down") {
-    this.audioConfig.targetVolume = direction.toLowerCase() === "up" ? this.audioConfig.maxVolume : 0;
+    this[_audioConfig].targetVolume = direction.toLowerCase() === "up" ? this[_audioConfig].maxVolume : 0;
     this.updateVolume();
     return this;
   }
@@ -355,43 +273,26 @@ class CodeRadio {
     let currentVolume = parseFloat(this[_player].volume.toFixed(1));
 
     // If the volume is correctly set to the target, no need to change it
-    if (currentVolume === this.audioConfig.targetVolume) {
+    if (currentVolume === this[_audioConfig].targetVolume) {
       // If the audio is set to 0 and it’s been met, pause the audio
-      if (this.audioConfig.targetVolume === 0) this[_player].pause();
+      if (this[_audioConfig].targetVolume === 0) this.pause();
 
       // Unmet audio volume settings require it to be changed
     } else {
       // We capture the value of the next increment by either the configuration or the difference between the current and target if it's smaller than the increment
-      let volumeNextIncrement = Math.min(this.audioConfig.volumeSteps, Math.abs(this.audioConfig.targetVolume - this[_player].volume));
+      let volumeNextIncrement = Math.min(this[_audioConfig].volumeSteps, Math.abs(this[_audioConfig].targetVolume - this[_player].volume));
 
       // Adjust the audio based on if the target is higher or lower than the current
       this[_player].volume +=
-        this.audioConfig.targetVolume > this[_player].volume
+        this[_audioConfig].targetVolume > this[_player].volume
           ? volumeNextIncrement
           : -volumeNextIncrement;
       
       this.emit('volumeChange', this[_player].volume);
 
       // The speed at which the audio lowers is also controlled.
-      setTimeout(() => this.updateVolume(), this.audioConfig.volumeTransitionSpeed);
+      setTimeout(() => this.updateVolume(), this[_audioConfig].volumeTransitionSpeed);
     }
-  }
-
-  renderMetadata() {
-    if (!!this[_currentSong].art) {
-      this.meta.picture.style.backgroundImage = `url(${this[_currentSong].art})`;
-      this.meta.container.classList.add("thumb");
-    } else {
-      this.meta.container.classList.remove("thumb");
-      this.meta.picture.style.backgroundImage = "";
-    }
-    this.meta.title.textContent = this[_currentSong].title;
-    this.meta.artist.textContent = this[_currentSong].artist;
-    this.meta.album.textContent = this[_currentSong].album;
-  }
-
-  updateProgress() {
-    this.meta.duration.value = (new Date().valueOf() - this[_songStartedAt]) / 1000;
   }
     
   on(trigger, fn, once = false) {

@@ -14,7 +14,7 @@ body {
   overflow: hidden;
 }
 
-footer.footer {
+footer {
   background-color: #0a0a23;
   height: 70px;
   width: 100%;
@@ -50,6 +50,7 @@ footer.footer {
   top: 18px;
   font-size: 20px;
 }
+
 #metaDisplay {
   width: calc(100% - 210px);
 }
@@ -165,10 +166,9 @@ footer.footer {
   position: absolute;
 }
 
-.details {
-  display: none;
+details {
   position: absolute;
-  bottom: 50px;
+  bottom: 100px;
   right: 50px;
   background-color: rgba(10, 10, 35, 0.6);
   color: #fff;
@@ -177,8 +177,8 @@ footer.footer {
   transition: opacity 0.25s ease-out;
 }
 
-.details:hover,
-.details[open] {
+details:hover,
+details[open] {
   opacity: 1;
 }
 
@@ -308,6 +308,11 @@ dd {
   margin-right: 5px;
   margin-top: 4px;
   height: auto;
+}
+
+nav select {
+  position: relative;
+  top: 15px;
 }
 
 @media (max-width: 500px) {
@@ -455,10 +460,6 @@ body {
   .under-header-content {
     flex-direction: column;
     height: 200px;
-  }
-  #container.animation,
-  #visualizer {
-    display: none;
   }
 
   footer.footer {
