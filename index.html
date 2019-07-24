@@ -61,7 +61,28 @@
       <div id="details"></div>
     </main>
     <progress value="0" max="100" data-meta="duration"></progress>
-    <footer id="footer"></footer>
+    <footer id="footer">
+      <div id="metaDisplay">
+        <div data-meta="picture"></div>
+        <div id="nowPlaying">
+          <div data-meta="title"></div>
+          <div data-meta="artist"></div>
+          <div data-meta="album"></div>
+          <div data-meta="listeners"></div>
+          <select data-meta="dropdown"></select>
+        </div>
+      </div>
+      <div id="playContainer">
+        <img
+          id="playButton"
+          src="https://cdn-media-1.freecodecamp.org/code-radio/pause.svg"
+          alt="Play Pause Button"
+        />
+      </div>
+      <div class="slider-container">
+        <input id="slider" type="range" min="0" max="10" value="0" />
+      </div>
+    </footer>
   </body>
 </html>
 
@@ -84,127 +105,48 @@
   };
 </script>
 
-<script>
-  //check for mobile and add related dom nodes
-  if (window.mobilecheck()) {
-    const container = document.getElementById("container");
-    container.innerHTML = `
-    <div class="middle">
-      <iframe
-        src="https://coderadio-admin.freecodecamp.org/public/coderadio/embed"
-        frameborder="0"
-        allowtransparency="true"
-        style="width: 100%; min-height: 120px; border: 0;">
-      </iframe>
-      <hr />
-      <p id="listeners-num"></p>
-    </div>`;
-
-    //call api and update the listener numbber
-    var xhr = new XMLHttpRequest();
-
-    function reqListener() {
-      var listenerNum = JSON.parse(this.response)[0].listeners.total;
-      listenerMounter(listenerNum);
-      setTimeout(callMaker, 20000);
-    }
-
-    function listenerMounter(number) {
-      var d = document.getElementById("listeners-num");
-      d.textContent = number + " coders listening right now";
-    }
-
-    function callMaker() {
-      xhr.addEventListener("load", reqListener);
-      xhr.open("GET", "/app/api/nowplaying");
-
-      xhr.send();
-    }
-
-    callMaker();
-  }
-</script>
-
 <script src="./player.js"></script>
 
 <script type="text/javascript">
   //check for desktop
+  var fCC_Player = new CodeRadio();
+  //start the show
+
+  var playButton = document.getElementById("playButton");
+  var slider = document.getElementById("slider");
+  var container = document.getElementById("container");
+
+  // set button initial state
+  if (fCC_Player._player.paused) {
+    playButton.src = "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
+  }
+
+  // set the vol slider
+  slider.oninput = function() {
+    fCC_Player.setTargetVolume(this.value / 10);
+  };
+
+  fCC_Player._player.onplay = function() {
+    playButton.src =
+      "https://cdn-media-1.freecodecamp.org/code-radio/pause.svg";
+  };
+
+  fCC_Player._player.onpause = function() {
+    playButton.src = "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
+  };
+
+  fCC_Player._player.onvolumechange = function() {
+    slider.value = Math.round(fCC_Player._player.volume * 10);
+  };
+
+  // play pause button condition
+  function handleToggleButton() {
+    fCC_Player.togglePlay();
+  }
+  document.getElementById("playContainer").onclick = handleToggleButton;
+
+  //bring in the animation
   if (window.mobilecheck() === false) {
-    //set up the footer
-    const footer = document.getElementById("footer");
-    footer.className = "footer";
-    var footerBlock = `
-      <div id="metaDisplay">
-        <div data-meta="picture"></div>
-        <div id="nowPlaying">
-          <div data-meta="title"></div>
-          <div data-meta="artist"></div>
-          <div data-meta="album"></div>
-          <div data-meta="listeners"></div>
-          <select data-meta="dropdown"></select>
-        </div>
-      </div>
-      <div id="playContainer">
-        <img
-          id="playButton"
-          src="https://cdn-media-1.freecodecamp.org/code-radio/pause.svg"
-          alt="Play Pause Button"
-        />
-        </div>
-      <div class="slider-container">
-        <input id="slider" type="range" min="0" max="10" value="0">
-      </div>
-      `;
-    footer.innerHTML = footerBlock;
-
-    //setup the info box for keyboard shortcuts
-    const details = document.getElementById("details");
-    details.className = "details";
-    var detailsBlock = `
-      <summary>Keyboard Controls</summary>
-      <dl>
-        <dt>Play/Pause:</dt><dd>Spacebar or "k"</dd>
-        <dt>Volume:</dt><dd>Up Arrow / Down Arrow</dd>
-      </dl>`;
-    details.innerHTML = detailsBlock;
-
-    //start the show
-    var fCC_Player = new CodeRadio();
-    var playButton = document.getElementById("playButton");
-    var slider = document.getElementById("slider");
-
-    // set button initial state
-    if (fCC_Player._player.paused) {
-      playButton.src =
-        "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
-    }
-
-    // set the vol slider
-    slider.oninput = function() {
-      fCC_Player.setTargetVolume(this.value / 10);
-    };
-
-    fCC_Player._player.onplay = function() {
-      playButton.src =
-        "https://cdn-media-1.freecodecamp.org/code-radio/pause.svg";
-    };
-
-    fCC_Player._player.onpause = function() {
-      playButton.src =
-        "https://cdn-media-1.freecodecamp.org/code-radio/play.svg";
-    };
-
-    fCC_Player._player.onvolumechange = function() {
-      slider.value = Math.round(fCC_Player._player.volume * 10);
-    };
-
-    // play pause button condition
-    function handleToggleButton() {
-      fCC_Player.togglePlay();
-    }
-    document.getElementById("playContainer").onclick = handleToggleButton;
-
-    //bring in the animation
     container.className = "animation";
   }
 </script>
