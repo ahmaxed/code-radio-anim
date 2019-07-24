@@ -161,7 +161,8 @@ footer.footer {
 
 progress {
   position: absolute;
-  top: -4px;
+  z-index: 100;
+  bottom: 74px;
   left: 4px;
   height: 4px;
   width: 100%;
