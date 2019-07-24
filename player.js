@@ -389,8 +389,12 @@ class CodeRadio {
   }
 
   renderStreams() {
-    let selection = document.createElement("option");
-    selection.value = "hello";
+    let selection = document.createElement("select");
+    this._streams.forEach(stream => {
+      let option = document.createElement("select");
+      option.value = stream.name;
+      selection.appendChild(option);
+    });
     this.meta.dropdown.appendChild(selection);
   }
 
