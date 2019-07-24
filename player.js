@@ -147,7 +147,9 @@ class CodeRadio {
           this.currentSong = np.now_playing.song;
           this.played_at = np.now_playing.played_at;
           this.duration = np.now_playing.duration;
-          this.meta.listeners.textContent = `${np.listeners.current}`;
+          this.meta.listeners.textContent = `coders listening now:${
+            np.listeners.current
+          }`;
           if (!this._progressInterval) {
             this._progressInterval = setInterval(
               () => this.updateProgress(),
