@@ -162,12 +162,10 @@ footer.footer {
 progress {
   position: absolute;
   z-index: 100;
-  bottom: 74px;
-  left: 4px;
+  bottom: 7px;
   height: 4px;
   width: 100%;
   background-color: silver;
-  border-radius: 50%;
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
