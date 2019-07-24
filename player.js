@@ -134,11 +134,11 @@ class CodeRadio {
           this.url = np.station.mounts.find(mount => !!mount.is_default).url;
           if (np.station.remote) {
           }
-          this.streams = np.station.mounts.concat(np.station.remotes);
+          console.log(this.url);
+          console.log(this._url);
+          console.log(this);
         }
-
-        console.log(this.streams);
-        console.log(this._streams);
+        //this.streams = np.station.mounts.concat(np.station.remotes);
 
         // We only need to update th metadata if the song has been changed
         if (
