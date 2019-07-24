@@ -63,10 +63,13 @@ class CodeRadio {
       artist: document.querySelector('[data-meta="artist"]'),
       album: document.querySelector('[data-meta="album"]'),
       duration: document.querySelector('[data-meta="duration"]'),
-      listeners: document.querySelector('[data-meta="listeners"]')
+      listeners: document.querySelector('[data-meta="listeners"]'),
+      dropdown: document.querySelector('[data-meta="dropdown"]')
     };
 
     this.setupEventListeners();
+
+    console.log(this._streams);
   }
 
   /***
@@ -137,9 +140,9 @@ class CodeRadio {
           this.url = np.station.mounts.find(mount => !!mount.is_default).url;
           if (np.station.remote) {
           }
-          console.log(this.url);
-          console.log(this._url);
-          console.log(this);
+          this._streams = np.station.mounts.concat(np.station.remotes);
+          console.log(this.streams);
+          console.log(this._streams);
         }
         //this.streams = np.station.mounts.concat(np.station.remotes);
 
