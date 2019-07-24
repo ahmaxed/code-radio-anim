@@ -171,7 +171,9 @@ class CodeRadio {
   setupEventListeners() {
     document.addEventListener("keydown", evt => this.keyboardControl(evt));
 
-    this.meta.dropdown.addEventListener("change", evt => console.log(evt));
+    this.meta.dropdown.addEventListener("change", evt =>
+      console.log(evt.target.value)
+    );
     // In order to get around some mobile browser limitations, we can only generate a lot
     // of the audio context stuff AFTER the audio has been triggered. We can't see it until
     // then anyway so it makes no difference to desktop.
@@ -393,7 +395,6 @@ class CodeRadio {
     this._streams.forEach(stream => {
       let option = document.createElement("option");
       option.value = stream.name;
-      option.url = stream.url;
       option.textContent = stream.name;
       this.meta.dropdown.appendChild(option);
     });
