@@ -160,7 +160,7 @@ footer.footer {
   width: 100%;
 }
 
-#nowPlaying progress {
+progress {
   position: absolute;
   bottom: 4px;
   left: 4px;
@@ -173,12 +173,12 @@ footer.footer {
   appearance: none;
 }
 
-#nowPlaying progress::-webkit-progress-bar {
+progress::-webkit-progress-bar {
   background-color: rgb(10, 10, 35);
   border-radius: 2px;
 }
 
-#nowPlaying progress::-webkit-progress-value {
+progress::-webkit-progress-value {
   background-color: white;
   border-radius: 2px;
   transition: all 0.1s linear;
