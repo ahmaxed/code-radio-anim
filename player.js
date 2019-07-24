@@ -123,11 +123,13 @@ class CodeRadio {
 
   getNowPlaying() {
     // To prevent browser based caching, we add the date to the request, it won't impact the response
-    fetch(`/app/api/nowplaying?t=${new Date().valueOf()}`)
+    fetch(
+      `https://coderadio-admin.freecodecamp.org/api/nowplaying?t=${new Date().valueOf()}`
+    )
       .then(req => req.json())
       .then(np => {
         np = np[0]; // There is only ever 1 song "Now Playing" so let's simplify the response
-
+        console.log(np);
         // We look through the available mounts to find the default mount (or just the listen_url)
         if (this.url === "")
           this.url = np.station.mounts.find(mount => !!mount.is_default).url;
