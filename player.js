@@ -192,7 +192,6 @@ class CodeRadio {
         console.log(target, stream.name);
         this._url = stream.url;
         this.pause();
-        this.play();
         return;
       }
     });
