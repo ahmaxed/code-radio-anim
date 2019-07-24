@@ -165,7 +165,7 @@ footer.footer {
   bottom: 4px;
   left: 4px;
   height: 4px;
-  width: calc(100% - 8px);
+  width: 100%;
   background-color: silver;
   border-radius: 50%;
   -webkit-appearance: none;
