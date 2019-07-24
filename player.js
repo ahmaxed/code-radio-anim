@@ -68,8 +68,6 @@ class CodeRadio {
     };
 
     this.setupEventListeners();
-
-    console.log(this._streams);
   }
 
   /***
@@ -131,17 +129,12 @@ class CodeRadio {
       .then(req => req.json())
       .then(np => {
         np = np[0]; // There is only ever 1 song "Now Playing" so let's simplify the response
-        console.log(np);
-        // We look through the available mounts to find the default mount (or just the listen_url)
 
-        console.log(this.url);
-        console.log(this._url);
+        // We look through the available mounts to find the default mount (or just the listen_url)
         if (this.url === "") {
           this.url = np.station.mounts.find(mount => !!mount.is_default).url;
-          if (np.station.remote) {
-          }
           this._streams = np.station.mounts.concat(np.station.remotes);
-          console.log(this.streams);
+          this.renderStreams();
           console.log(this._streams);
         }
         //this.streams = np.station.mounts.concat(np.station.remotes);
@@ -393,6 +386,12 @@ class CodeRadio {
     this.meta.title.textContent = this._currentSong.title;
     this.meta.artist.textContent = this._currentSong.artist;
     this.meta.album.textContent = this._currentSong.album;
+  }
+
+  renderStreams() {
+    let selection = document.createElement("option");
+    selection.value = "hello";
+    this.meta.dropdown.appendChild(selection);
   }
 
   updateProgress() {
