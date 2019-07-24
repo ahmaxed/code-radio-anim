@@ -171,6 +171,7 @@ class CodeRadio {
   setupEventListeners() {
     document.addEventListener("keydown", evt => this.keyboardControl(evt));
 
+    this.meta.dropdown.addEventListener("change", evt => console.log(evt));
     // In order to get around some mobile browser limitations, we can only generate a lot
     // of the audio context stuff AFTER the audio has been triggered. We can't see it until
     // then anyway so it makes no difference to desktop.
