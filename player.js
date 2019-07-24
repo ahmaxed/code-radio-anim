@@ -391,7 +391,7 @@ class CodeRadio {
   renderStreams() {
     let selection = document.createElement("select");
     this._streams.forEach(stream => {
-      let option = document.createElement("select");
+      let option = document.createElement("option");
       option.value = stream.name;
       selection.appendChild(option);
     });
