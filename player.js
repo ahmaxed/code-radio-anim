@@ -189,7 +189,7 @@ class CodeRadio {
     let target = evt.target.value;
     let value = this._streams.forEach(stream => {
       if (stream.name === target) {
-        console.log(target, stream.url);
+        console.log(target, stream.name);
         this.url = stream.url;
         this.play();
         return;
