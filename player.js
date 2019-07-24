@@ -171,9 +171,11 @@ class CodeRadio {
   setupEventListeners() {
     document.addEventListener("keydown", evt => this.keyboardControl(evt));
 
+    // listen for changes in the dropdown
     this.meta.dropdown.addEventListener("change", evt =>
       this.handleDropdownChange(evt)
     );
+
     // In order to get around some mobile browser limitations, we can only generate a lot
     // of the audio context stuff AFTER the audio has been triggered. We can't see it until
     // then anyway so it makes no difference to desktop.
@@ -185,6 +187,8 @@ class CodeRadio {
     });
   }
 
+  //handle drop down changes
+  //note: pause before play because play() requires pause :)
   handleDropdownChange(evt = {}) {
     let target = evt.target.value;
     let value = this._streams.forEach(stream => {
