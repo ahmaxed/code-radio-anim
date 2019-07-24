@@ -45,6 +45,9 @@ class CodeRadio {
     this._player.crossOrigin = "anonymous";
     // Note: the crossOrigin is needed to fix a CORS JavaScript requirement
 
+    // here are all the streams
+    this._streams = [];
+
     /***
      * There are a few *private* variables used
      */
@@ -129,8 +132,14 @@ class CodeRadio {
         np = np[0]; // There is only ever 1 song "Now Playing" so let's simplify the response
         console.log(np);
         // We look through the available mounts to find the default mount (or just the listen_url)
-        if (this.url === "")
+        if (this.url === "") {
           this.url = np.station.mounts.find(mount => !!mount.is_default).url;
+          if (np.station.remote) {
+          }
+        }
+
+        console.log(this.url);
+        console.log(this._url);
 
         // We only need to update th metadata if the song has been changed
         if (
