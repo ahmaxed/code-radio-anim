@@ -188,8 +188,8 @@ class CodeRadio {
   handleDropdownChange(evt = {}) {
     let target = evt.target.value;
     let value = this._streams.forEach(stream => {
-      console.log(target, stream.url);
       if (stream.url === target) {
+        console.log(target, stream.url);
         this.url = stream.url;
         this.play();
         return;
