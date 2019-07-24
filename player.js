@@ -393,7 +393,7 @@ class CodeRadio {
     this._streams.forEach(stream => {
       let option = document.createElement("option");
       option.value = stream.name;
-      ption.url = stream.url;
+      option.url = stream.url;
       option.textContent = stream.name;
       this.meta.dropdown.appendChild(option);
     });
